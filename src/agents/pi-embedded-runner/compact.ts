@@ -277,7 +277,8 @@ export async function compactEmbeddedPiSessionDirect(
   let authProfileId = params.authProfileId;
 
   if (typeof compactionModelOverride === "string" && compactionModelOverride.trim()) {
-    const { provider: overrideProvider, model: overrideModel } = splitModelRef(compactionModelOverride);
+    const { provider: overrideProvider, model: overrideModel } =
+      splitModelRef(compactionModelOverride);
     if (overrideProvider && overrideModel && overrideProvider.trim() && overrideModel.trim()) {
       provider = overrideProvider.trim();
       modelId = overrideModel.trim();
