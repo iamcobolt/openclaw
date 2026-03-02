@@ -15,6 +15,7 @@ import {
 import { normalizeDeliveryContext } from "../utils/delivery-context.js";
 import { resolveAgentConfig, resolveAgentWorkspaceDir } from "./agent-scope.js";
 import { AGENT_LANE_SUBAGENT } from "./lanes.js";
+import { splitModelRef } from "./model-ref.js";
 import { resolveSubagentSpawnModelSelection } from "./model-selection.js";
 import { resolveSandboxRuntimeStatus } from "./sandbox/runtime-status.js";
 import { buildSubagentSystemPrompt } from "./subagent-announce.js";
@@ -87,6 +88,8 @@ export type SpawnSubagentContext = {
   requesterAgentIdOverride?: string;
 };
 
+export { splitModelRef };
+
 export const SUBAGENT_SPAWN_ACCEPTED_NOTE =
   "auto-announces on completion, do not poll/sleep. The response will be sent back as an user message.";
 export const SUBAGENT_SPAWN_SESSION_ACCEPTED_NOTE =
@@ -107,21 +110,6 @@ export type SpawnSubagentResult = {
     relDir: string;
   };
 };
-
-export function splitModelRef(ref?: string) {
-  if (!ref) {
-    return { provider: undefined, model: undefined };
-  }
-  const trimmed = ref.trim();
-  if (!trimmed) {
-    return { provider: undefined, model: undefined };
-  }
-  const [provider, model] = trimmed.split("/", 2);
-  if (model) {
-    return { provider, model };
-  }
-  return { provider: undefined, model: trimmed };
-}
 
 function sanitizeMountPathHint(value?: string): string | undefined {
   const trimmed = value?.trim();
