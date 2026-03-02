@@ -176,7 +176,7 @@ async function processMessage(
   const chatId = message.threadId;
   const senderId = message.senderId?.trim();
   if (!senderId) {
-    logVerbose(core, runtime, `zalouser: drop message ${chatId} (missing senderId)`);
+    logVerbose(core, runtime, `zalouser: drop message ${message.threadId} (missing senderId)`);
     return;
   }
   const senderName = message.senderName ?? "";
