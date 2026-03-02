@@ -30,6 +30,12 @@ x-i18n:
 
 有关 `agents.defaults.compaction` 设置，请参阅[压缩配置与模式](/concepts/compaction)。
 
+如果你希望压缩摘要始终使用某个固定模型（通常更快/更便宜），可以设置：
+
+- `agents.defaults.compaction.model: "provider/model"`
+
+设置后，压缩摘要会使用该模型，而不是会话当前的主模型。
+
 ## 自动压缩（默认开启）
 
 当会话接近或超过模型的上下文窗口时，OpenClaw 会触发自动压缩，并可能使用压缩后的上下文重试原始请求。

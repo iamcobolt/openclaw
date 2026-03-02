@@ -136,6 +136,18 @@ function createCompactionDiagId(): string {
   return `cmp-${Date.now().toString(36)}-${generateSecureToken(4)}`;
 }
 
+function splitModelRef(ref?: string): { provider?: string; model?: string } {
+  const trimmed = ref?.trim();
+  if (!trimmed) {
+    return { provider: undefined, model: undefined };
+  }
+  const [provider, model] = trimmed.split("/", 2);
+  if (provider && model) {
+    return { provider, model };
+  }
+  return { provider: undefined, model: trimmed };
+}
+
 function getMessageTextChars(msg: AgentMessage): number {
   const content = (msg as { content?: unknown }).content;
   if (typeof content === "string") {
@@ -256,8 +268,35 @@ export async function compactEmbeddedPiSessionDirect(
   const resolvedWorkspace = resolveUserPath(params.workspaceDir);
   const prevCwd = process.cwd();
 
-  const provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
-  const modelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+  let provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
+  let modelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+
+  const originalProvider = provider;
+  const originalModelId = modelId;
+  const compactionModelOverride = params.config?.agents?.defaults?.compaction?.model;
+  let authProfileId = params.authProfileId;
+
+  if (typeof compactionModelOverride === "string" && compactionModelOverride.trim()) {
+    const { provider: overrideProvider, model: overrideModel } = splitModelRef(compactionModelOverride);
+    if (overrideProvider && overrideModel && overrideProvider.trim() && overrideModel.trim()) {
+      provider = overrideProvider.trim();
+      modelId = overrideModel.trim();
+      // Avoid applying an auth-profile id chosen for a different provider.
+      if (provider !== originalProvider) {
+        authProfileId = undefined;
+      }
+      if (provider !== originalProvider || modelId !== originalModelId) {
+        log.debug(
+          `[compaction] using model override ${provider}/${modelId} (was ${originalProvider}/${originalModelId})`,
+        );
+      }
+    } else {
+      log.warn(
+        `[compaction] invalid agents.defaults.compaction.model=${JSON.stringify(compactionModelOverride)} (expected provider/model)`,
+      );
+    }
+  }
+
   const fail = (reason: string): EmbeddedPiCompactResult => {
     log.warn(
       `[compaction-diag] end runId=${runId} sessionKey=${params.sessionKey ?? params.sessionId} ` +
@@ -287,7 +326,7 @@ export async function compactEmbeddedPiSessionDirect(
     const apiKeyInfo = await getApiKeyForModel({
       model,
       cfg: params.config,
-      profileId: params.authProfileId,
+      profileId: authProfileId,
       agentDir,
     });
 

@@ -249,6 +249,12 @@ OpenClaw also enforces a safety floor for embedded runs:
 - Set `agents.defaults.compaction.reserveTokensFloor: 0` to disable the floor.
 - If it’s already higher, OpenClaw leaves it alone.
 
+You can also force compaction summarization to run on a different model than the active session model:
+
+- `agents.defaults.compaction.model: "provider/model"`
+
+This is useful to keep your main session on a high-quality model while compaction uses a faster/cheaper model.
+
 Why: leave enough headroom for multi-turn “housekeeping” (like memory writes) before compaction becomes unavoidable.
 
 Implementation: `ensurePiCompactionReserveTokens()` in `src/agents/pi-settings.ts`

@@ -285,6 +285,8 @@ export type AgentCompactionIdentifierPolicy = "strict" | "off" | "custom";
 export type AgentCompactionConfig = {
   /** Compaction summarization mode. */
   mode?: AgentCompactionMode;
+  /** Optional model override for compaction summarization (provider/model). */
+  model?: string;
   /** Pi reserve tokens target before floor enforcement. */
   reserveTokens?: number;
   /** Pi keepRecentTokens budget used for cut-point selection. */

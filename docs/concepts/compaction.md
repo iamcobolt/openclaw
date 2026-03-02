@@ -22,6 +22,12 @@ Compaction **persists** in the session’s JSONL history.
 ## Configuration
 
 Use the `agents.defaults.compaction` setting in your `openclaw.json` to configure compaction behavior (mode, target tokens, etc.).
+
+If you want compaction to always run on a specific (often faster/cheaper) model, set:
+
+- `agents.defaults.compaction.model: "provider/model"`
+
+When set, compaction summarization uses that model instead of the session's active model.
 Compaction summarization preserves opaque identifiers by default (`identifierPolicy: "strict"`). You can override this with `identifierPolicy: "off"` or provide custom text with `identifierPolicy: "custom"` and `identifierInstructions`.
 
 ## Auto-compaction (default on)

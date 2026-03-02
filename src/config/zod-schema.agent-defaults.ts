@@ -84,6 +84,13 @@ export const AgentDefaultsSchema = z
     compaction: z
       .object({
         mode: z.union([z.literal("default"), z.literal("safeguard")]).optional(),
+        /** Optional model override for compaction summarization (provider/model). */
+        model: z
+          .string()
+          .optional()
+          .describe(
+            "Model (provider/model) to use for compaction summarization. Defaults to the session's active model.",
+          ),
         reserveTokens: z.number().int().nonnegative().optional(),
         keepRecentTokens: z.number().int().positive().optional(),
         reserveTokensFloor: z.number().int().nonnegative().optional(),
