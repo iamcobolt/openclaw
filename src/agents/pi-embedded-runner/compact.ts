@@ -624,6 +624,15 @@ export async function compactEmbeddedPiSessionDirect(
         // Sets compaction/pruning runtime state and returns extension factories
         // that must be passed to the resource loader for the safeguard to be active.
         const cand = allCandidates[candidateIdx];
+        // Re-resolve transcript policy per candidate so provider-specific flags
+        // (validateGeminiTurns, validateAnthropicTurns, etc.) are correct for
+        // cross-provider fallbacks. Shadows the outer transcriptPolicy used for
+        // sessionManager setup above.
+        const transcriptPolicy = resolveTranscriptPolicy({
+          modelApi: currentModel.api,
+          provider: cand.provider,
+          modelId: cand.model,
+        });
         const extensionFactories = buildEmbeddedExtensionFactories({
           cfg: params.config,
           sessionManager,
@@ -665,9 +674,9 @@ export async function compactEmbeddedPiSessionDirect(
           try {
             const prior = await sanitizeSessionHistory({
               messages: session.messages,
-              modelApi: model.api,
-              modelId,
-              provider,
+              modelApi: currentModel.api,
+              modelId: cand.model,
+              provider: cand.provider,
               allowedToolNames,
               config: params.config,
               sessionManager,
@@ -731,7 +740,7 @@ export async function compactEmbeddedPiSessionDirect(
             if (diagEnabled && preMetrics) {
               log.debug(
                 `[compaction-diag] start runId=${runId} sessionKey=${params.sessionKey ?? params.sessionId} ` +
-                  `diagId=${diagId} trigger=${trigger} provider=${provider}/${modelId} ` +
+                  `diagId=${diagId} trigger=${trigger} provider=${cand.provider}/${cand.model} ` +
                   `attempt=${attempt} maxAttempts=${maxAttempts} ` +
                   `pre.messages=${preMetrics.messages} pre.historyTextChars=${preMetrics.historyTextChars} ` +
                   `pre.toolResultChars=${preMetrics.toolResultChars} pre.estTokens=${preMetrics.estTokens ?? "unknown"}`,
@@ -785,7 +794,7 @@ export async function compactEmbeddedPiSessionDirect(
             if (diagEnabled && preMetrics && postMetrics) {
               log.debug(
                 `[compaction-diag] end runId=${runId} sessionKey=${params.sessionKey ?? params.sessionId} ` +
-                  `diagId=${diagId} trigger=${trigger} provider=${provider}/${modelId} ` +
+                  `diagId=${diagId} trigger=${trigger} provider=${cand.provider}/${cand.model} ` +
                   `attempt=${attempt} maxAttempts=${maxAttempts} outcome=compacted reason=none ` +
                   `durationMs=${Date.now() - compactStartedAt} retrying=false ` +
                   `post.messages=${postMetrics.messages} post.historyTextChars=${postMetrics.historyTextChars} ` +
