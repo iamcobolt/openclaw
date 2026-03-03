@@ -87,10 +87,9 @@ export const AgentDefaultsSchema = z
         /** Optional model override for compaction summarization (provider/model). */
         model: z
           .string()
-          .regex(/^[^/\s]+\/[^/\s]+$/, { message: "must be in provider/model format" })
           .optional()
           .describe(
-            "Model (provider/model) to use for compaction summarization. Defaults to the session's active model.",
+            "Model to use for compaction summarization (provider/model or model alias). Defaults to the session's active model.",
           ),
         /** Optional thinking level override for compaction summarization. */
         thinking: z

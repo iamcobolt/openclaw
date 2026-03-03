@@ -14,9 +14,9 @@ import {
 } from "../routing/session-key.js";
 import { normalizeDeliveryContext } from "../utils/delivery-context.js";
 import { resolveAgentConfig, resolveAgentWorkspaceDir } from "./agent-scope.js";
+import { DEFAULT_PROVIDER } from "./defaults.js";
 import { AGENT_LANE_SUBAGENT } from "./lanes.js";
-import { splitModelRef } from "./model-ref.js";
-import { resolveSubagentSpawnModelSelection } from "./model-selection.js";
+import { parseModelRef, resolveSubagentSpawnModelSelection } from "./model-selection.js";
 import { resolveSandboxRuntimeStatus } from "./sandbox/runtime-status.js";
 import { buildSubagentSystemPrompt } from "./subagent-announce.js";
 import { getSubagentDepthFromSessionStore } from "./subagent-depth.js";
@@ -87,8 +87,6 @@ export type SpawnSubagentContext = {
   agentGroupSpace?: string | null;
   requesterAgentIdOverride?: string;
 };
-
-export { splitModelRef };
 
 export const SUBAGENT_SPAWN_ACCEPTED_NOTE =
   "auto-announces on completion, do not poll/sleep. The response will be sent back as an user message.";
@@ -389,8 +387,8 @@ export async function spawnSubagentDirect(
   if (thinkingCandidateRaw) {
     const normalized = normalizeThinkLevel(thinkingCandidateRaw);
     if (!normalized) {
-      const { provider, model } = splitModelRef(resolvedModel);
-      const hint = formatThinkingLevels(provider, model);
+      const parsed = parseModelRef(resolvedModel ?? "", DEFAULT_PROVIDER);
+      const hint = formatThinkingLevels(parsed?.provider, parsed?.model);
       return {
         status: "error",
         error: `Invalid thinking level "${thinkingCandidateRaw}". Use one of: ${hint}.`,

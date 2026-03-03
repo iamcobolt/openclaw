@@ -1,6 +1,7 @@
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
 import type { OpenClawConfig } from "../../config/config.js";
-import { splitModelRef } from "../model-ref.js";
+import { splitTrailingAuthProfile } from "../model-ref-profile.js";
+import { type ModelAliasIndex, resolveModelRefFromString } from "../model-selection.js";
 
 export type ResolvedCompactionModelOverride = {
   provider: string;
@@ -18,6 +19,7 @@ export function resolveCompactionModelOverride(params: {
   modelId: string;
   authProfileId?: string;
   cfg?: OpenClawConfig;
+  aliasIndex?: ModelAliasIndex;
 }): ResolvedCompactionModelOverride {
   const originalProvider = params.provider;
   const originalModelId = params.modelId;
@@ -32,13 +34,26 @@ export function resolveCompactionModelOverride(params: {
   let overrideInvalid = false;
 
   if (overrideTrimmed) {
-    const { provider: overrideProvider, model: overrideModel } = splitModelRef(overrideTrimmed);
-    if (overrideProvider && overrideModel && overrideProvider.trim() && overrideModel.trim()) {
-      provider = overrideProvider.trim();
-      modelId = overrideModel.trim();
+    // Strip optional @profile suffix (e.g. "openai/gpt-4.1-mini@myprofile")
+    const { model: modelPart, profile: profileOverride } =
+      splitTrailingAuthProfile(overrideTrimmed);
+    const resolved = modelPart
+      ? resolveModelRefFromString({
+          raw: modelPart,
+          defaultProvider: originalProvider,
+          aliasIndex: params.aliasIndex,
+        })
+      : null;
+
+    if (resolved) {
+      provider = resolved.ref.provider;
+      modelId = resolved.ref.model;
       overrideApplied = provider !== originalProvider || modelId !== originalModelId;
-      // Avoid applying an auth-profile id chosen for a different provider.
-      if (provider !== originalProvider) {
+      if (profileOverride) {
+        // Explicit @profile in override string takes precedence.
+        authProfileId = profileOverride;
+      } else if (provider !== originalProvider) {
+        // Avoid using an auth profile scoped to a different provider.
         authProfileId = undefined;
       }
     } else {

@@ -32,6 +32,7 @@ import { formatUserTime, resolveUserTimeFormat, resolveUserTimezone } from "../d
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../defaults.js";
 import { resolveOpenClawDocsPath } from "../docs-path.js";
 import { getApiKeyForModel, resolveModelAuthMode } from "../model-auth.js";
+import { buildModelAliasIndex } from "../model-selection.js";
 import { ensureOpenClawModelsJson } from "../models-config.js";
 import { resolveOwnerDisplaySetting } from "../owner-display.js";
 import {
@@ -263,11 +264,16 @@ export async function compactEmbeddedPiSessionDirect(
   const defaultProvider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
   const defaultModelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
 
+  const aliasIndex = params.config
+    ? buildModelAliasIndex({ cfg: params.config, defaultProvider })
+    : undefined;
+
   const resolvedModelOverride = resolveCompactionModelOverride({
     provider: defaultProvider,
     modelId: defaultModelId,
     authProfileId: params.authProfileId,
     cfg: params.config,
+    aliasIndex,
   });
 
   let provider = resolvedModelOverride.provider;
