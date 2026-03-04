@@ -261,7 +261,10 @@ export async function compactEmbeddedPiSessionDirect(
   const provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
   const modelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
   // Session lock covers all thinking-retry attempts (at most 2 compaction attempts).
-  let effectiveThinkLevel = resolveCompactionThinkLevel({ cfg: params.config });
+  let effectiveThinkLevel = resolveCompactionThinkLevel({
+    cfg: params.config,
+    sessionThinkLevel: params.thinkLevel,
+  });
   const fail = (reason: string): EmbeddedPiCompactResult => {
     log.warn(
       `[compaction-diag] end runId=${runId} sessionKey=${params.sessionKey ?? params.sessionId} ` +

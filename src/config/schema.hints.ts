@@ -68,9 +68,6 @@ const GROUP_ORDER: Record<string, number> = {
   logging: 900,
 };
 
-/** Paths that should always render as segmented buttons regardless of option count. */
-const FIELD_FORCE_SEGMENTED: string[] = ["agents.defaults.compaction.thinking"];
-
 const FIELD_PLACEHOLDERS: Record<string, string> = {
   "gateway.remote.url": "ws://host:18789",
   "gateway.remote.tlsFingerprint": "sha256:ab12cd34…",
@@ -144,10 +141,6 @@ export function buildBaseHints(): ConfigUiHints {
   for (const [path, placeholder] of Object.entries(FIELD_PLACEHOLDERS)) {
     const current = hints[path];
     hints[path] = current ? { ...current, placeholder } : { placeholder };
-  }
-  for (const path of FIELD_FORCE_SEGMENTED) {
-    const current = hints[path];
-    hints[path] = current ? { ...current, forceSegmented: true } : { forceSegmented: true };
   }
   return applyDerivedTags(hints);
 }
