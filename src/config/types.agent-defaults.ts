@@ -1,4 +1,3 @@
-import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { ChannelId } from "../channels/plugins/types.js";
 import type { AgentModelConfig, AgentSandboxConfig } from "./types.agents-shared.js";
 import type {
@@ -293,10 +292,10 @@ export type AgentCompactionIdentifierPolicy = "strict" | "off" | "custom";
 export type AgentCompactionConfig = {
   /** Compaction summarization mode. */
   mode?: AgentCompactionMode;
-  /** Thinking level for compaction summarization. Defaults to "off" regardless of session model. */
-  thinking?: ThinkLevel;
-  /** Fallback model on quota/rate-limit errors: "off" (default), "fallback" (use model.fallbacks chain), or "provider/model". */
-  fallbackModel?: string;
+  /** Thinking override for compaction: "off" (default) disables thinking; "on" inherits the session model's current thinking level. */
+  thinking?: "off" | "on";
+  /** Fallback model on quota/rate-limit errors: "off" (default) or "fallback" (use model.fallbacks chain). */
+  fallbackModel?: "off" | "fallback";
   /** Pi reserve tokens target before floor enforcement. */
   reserveTokens?: number;
   /** Pi keepRecentTokens budget used for cut-point selection. */

@@ -655,7 +655,10 @@ export async function compactEmbeddedPiSessionDirect(
         }
 
         // Thinking retry loop: on timeout with thinking enabled, retry once without thinking.
-        let effectiveThinkLevel = resolveCompactionThinkLevel({ cfg: params.config });
+        let effectiveThinkLevel = resolveCompactionThinkLevel({
+          cfg: params.config,
+          sessionThinkLevel: params.thinkLevel,
+        });
         for (let thinkAttempt = 0; thinkAttempt <= 1; thinkAttempt++) {
           const { session } = await createAgentSession({
             cwd: resolvedWorkspace,

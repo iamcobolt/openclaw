@@ -12,16 +12,23 @@ describe("resolveCompactionThinkLevel", () => {
     expect(resolveCompactionThinkLevel({ cfg })).toBe("off");
   });
 
-  it("returns the configured thinking level", () => {
-    const cfg = {
-      agents: { defaults: { compaction: { thinking: "low" } } },
-    } as unknown as OpenClawConfig;
-    expect(resolveCompactionThinkLevel({ cfg })).toBe("low");
-  });
-
-  it("explicit off is the same as the default", () => {
+  it("returns off when thinking is explicitly off", () => {
     const cfg = {
       agents: { defaults: { compaction: { thinking: "off" } } },
+    } as unknown as OpenClawConfig;
+    expect(resolveCompactionThinkLevel({ cfg })).toBe("off");
+  });
+
+  it("inherits session thinking level when thinking is on", () => {
+    const cfg = {
+      agents: { defaults: { compaction: { thinking: "on" } } },
+    } as unknown as OpenClawConfig;
+    expect(resolveCompactionThinkLevel({ cfg, sessionThinkLevel: "medium" })).toBe("medium");
+  });
+
+  it("falls back to off when thinking is on but no session level is provided", () => {
+    const cfg = {
+      agents: { defaults: { compaction: { thinking: "on" } } },
     } as unknown as OpenClawConfig;
     expect(resolveCompactionThinkLevel({ cfg })).toBe("off");
   });
