@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="110" viewBox="0 0 480 110">
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    </style>
+  </defs>
+  <!-- Card background -->
+  <rect x="1" y="1" width="478" height="108" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <!-- Label -->
+  <text x="16" y="26" font-size="13" font-weight="600" fill="#24292f">Compaction Thinking</text>
+  <!-- Help text -->
+  <text x="16" y="44" font-size="12" fill="#57606a">Defaults to "off" — compaction runs without extended thinking regardless of session model.</text>
+  <!-- Segmented control: off (active) -->
+  <rect x="16" y="56" width="72" height="32" rx="5" fill="#0969da" stroke="#0969da" stroke-width="1"/>
+  <text x="52" y="77" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">off</text>
+  <!-- Segmented control: on -->
+  <rect x="88" y="56" width="72" height="32" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+  <text x="124" y="77" font-size="13" fill="#57606a" text-anchor="middle">on</text>
+</svg>
