@@ -8,6 +8,8 @@ export type ConfigUiHint = {
   sensitive?: boolean;
   placeholder?: string;
   itemTemplate?: unknown;
+  /** Force segmented button rendering even when the option count exceeds the default threshold. */
+  forceSegmented?: boolean;
 };
 
 export type ConfigUiHints = Record<string, ConfigUiHint>;

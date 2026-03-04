@@ -378,7 +378,8 @@ export function renderNode(params: {
     const literals = nonNull.map(extractLiteral);
     const allLiterals = literals.every((v) => v !== undefined);
 
-    if (allLiterals && literals.length > 0 && literals.length <= 5) {
+    const forceSegmented = hintForPath(path, hints)?.forceSegmented ?? false;
+    if (allLiterals && literals.length > 0 && (literals.length <= 5 || forceSegmented)) {
       // Use segmented control for small sets
       const resolvedValue = value ?? schema.default;
       return html`
@@ -410,7 +411,7 @@ export function renderNode(params: {
       `;
     }
 
-    if (allLiterals && literals.length > 5) {
+    if (allLiterals && literals.length > 5 && !forceSegmented) {
       // Use dropdown for larger sets
       return renderSelect({ ...params, options: literals, value: value ?? schema.default });
     }
@@ -442,10 +443,11 @@ export function renderNode(params: {
     }
   }
 
-  // Enum - use segmented for small, dropdown for large
+  // Enum - use segmented for small (or forceSegmented), dropdown for large
   if (schema.enum) {
     const options = schema.enum;
-    if (options.length <= 5) {
+    const forceSegmentedEnum = hintForPath(path, hints)?.forceSegmented ?? false;
+    if (options.length <= 5 || forceSegmentedEnum) {
       const resolvedValue = value ?? schema.default;
       return html`
         <div class="cfg-field">
